@@ -29,7 +29,7 @@
   MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
   controller.managedObjectContext = self.managedObjectContext;
 
-  [DBT setAPIKey:@"1f2bbafcfadc45e8feec9ef4277385e5"];
+  [DBT setAPIKey:@"[REPLACEME]"];
 
   return YES;
 }
