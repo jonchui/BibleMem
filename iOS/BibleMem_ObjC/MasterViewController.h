@@ -12,7 +12,9 @@
 
 @class DetailViewController;
 
-@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate>
+@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate> {
+  NSTimer *verseTimer;
+}
 
 @property (strong, nonatomic) DetailViewController *detailViewController;
 

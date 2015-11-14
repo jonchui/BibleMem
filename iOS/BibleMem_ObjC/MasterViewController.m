@@ -63,23 +63,6 @@
       NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
       abort();
   }
-//
-//  [DBT getLibraryVolumeWithDamID:nil
-//                    languageCode:@"ENG"
-//                           media:@"text"
-//                         success:^(NSArray *volumes) {
-//                           NSLog(@"Volumes %@", volumes);
-//                         } failure:^(NSError *error) {
-//                           NSLog(@"Error: %@", error);
-//                         }];
-
-//  [DBT getLibraryBookWithDamId:@"ENGESVN2ET"
-//                       success:^(NSArray *books) {
-//                         NSLog(@"Books: %@", books);
-//                       } failure:^(NSError *error) {
-//                         NSLog(@"Error: %@", error);
-//                       }];
-
   
   [DBT getTextVerseWithDamId:@"ENGESVN2ET"
                         book:@"John"
@@ -149,43 +132,31 @@
   if (object == self.audioPlayer && [keyPath isEqualToString:@"status"]) {
     if (self.audioPlayer.status == AVPlayerStatusFailed)
     {
-      //  //NSLog(@"AVPlayer Failed");
+      NSLog(@"AVPlayer Failed");
     }
     else if (self.audioPlayer.status == AVPlayerStatusReadyToPlay)
     {
-
-      Float64 seconds = 78.132f;
-
-//      Float64 seconds = 266.6f;
+      Float64 seconds = 78.132f;  // Verse 15 start
       CMTime targetTime = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
       [self.audioPlayer seekToTime:targetTime
               toleranceBefore:kCMTimePositiveInfinity toleranceAfter:kCMTimeZero];
 
-
-      CMTime tm = CMTimeMakeWithSeconds(5.3, 100); // 5.3 sec
-
-      [self.audioPlayer addPeriodicTimeObserverForInterval:tm
-                                                            queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
-
-                                                              NSDateFormatter *DateFormatter=[[NSDateFormatter alloc] init];
-                                                              [DateFormatter setDateFormat:@"yyyy-MM-dd hh:mm:ss:mmm"];
-                                                              NSLog(@"%@",[DateFormatter stringFromDate:[NSDate date]]);
-
-                                                            }
-       ];
+      verseTimer = [NSTimer scheduledTimerWithTimeInterval:11.424  // Verse 15 duration: 89.556 - 78.132
+                                                target:self
+                                              selector:@selector(timerFired:)
+                                              userInfo:nil
+                                               repeats:NO];
 
       [self.audioPlayer play];
-
-
 
     }
     else if (self.audioPlayer.status == AVPlayerItemStatusUnknown)
     {
-      //  //NSLog(@"AVPlayer Unknown");
-
+       NSLog(@"AVPlayer unknown status");
     }
   }
 }
+
 
 #pragma mark - Segues
 
@@ -331,6 +302,14 @@
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
     [self.tableView endUpdates];
+}
+
+-(void)timerFired:(NSTimer *) theTimer
+{
+  if (theTimer == verseTimer) {
+    NSLog(@"timerFired !!! @ %@", [theTimer fireDate]);
+    [self.audioPlayer pause];
+  }
 }
 
 /*
