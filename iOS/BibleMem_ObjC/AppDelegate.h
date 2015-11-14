@@ -10,11 +10,7 @@
 #import <CoreData/CoreData.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate> {
-  AVAudioPlayer *myAudioPlayer;
-}
-
-@property (nonatomic, retain) AVAudioPlayer *myAudioPlayer;
+@interface AppDelegate : UIResponder <UIApplicationDelegate>;
 
 @property (strong, nonatomic) UIWindow *window;
 

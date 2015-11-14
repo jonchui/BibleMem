@@ -17,7 +17,7 @@
 
 @interface MasterViewController ()
 
-@property (nonatomic,strong)    AVPlayer *audioStremarPlayer;
+@property (nonatomic,strong)    AVPlayer *audioPlayer;
 
 @end
 
@@ -123,12 +123,10 @@
                                            NSString *urlString = [NSString stringWithFormat:@"%@/%@",location.baseURL,audioPath.path];
                                            NSURL *url = [NSURL URLWithString:urlString];
                                            NSLog(@"Audio file URL: %@", url);
-                                           NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:urlString ];
 
-                                           // stremar player
                                            AVPlayer *player = [[AVPlayer alloc]initWithURL:url];
-                                           _audioStremarPlayer= player;
-                                           [_audioStremarPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
+                                           _audioPlayer= player;
+                                           [_audioPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
 
 
                                            NSLog(@"After play: %@", urlString);
@@ -148,25 +146,25 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 
-  if (object == self.audioStremarPlayer && [keyPath isEqualToString:@"status"]) {
-    if (self.audioStremarPlayer.status == AVPlayerStatusFailed)
+  if (object == self.audioPlayer && [keyPath isEqualToString:@"status"]) {
+    if (self.audioPlayer.status == AVPlayerStatusFailed)
     {
       //  //NSLog(@"AVPlayer Failed");
     }
-    else if (self.audioStremarPlayer.status == AVPlayerStatusReadyToPlay)
+    else if (self.audioPlayer.status == AVPlayerStatusReadyToPlay)
     {
 
       Float64 seconds = 78.132f;
 
 //      Float64 seconds = 266.6f;
       CMTime targetTime = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
-      [self.audioStremarPlayer seekToTime:targetTime
+      [self.audioPlayer seekToTime:targetTime
               toleranceBefore:kCMTimePositiveInfinity toleranceAfter:kCMTimeZero];
 
 
       CMTime tm = CMTimeMakeWithSeconds(5.3, 100); // 5.3 sec
 
-      [self.audioStremarPlayer addPeriodicTimeObserverForInterval:tm
+      [self.audioPlayer addPeriodicTimeObserverForInterval:tm
                                                             queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
 
                                                               NSDateFormatter *DateFormatter=[[NSDateFormatter alloc] init];
@@ -176,12 +174,12 @@
                                                             }
        ];
 
-      [self.audioStremarPlayer play];
+      [self.audioPlayer play];
 
 
 
     }
-    else if (self.audioStremarPlayer.status == AVPlayerItemStatusUnknown)
+    else if (self.audioPlayer.status == AVPlayerItemStatusUnknown)
     {
       //  //NSLog(@"AVPlayer Unknown");
 

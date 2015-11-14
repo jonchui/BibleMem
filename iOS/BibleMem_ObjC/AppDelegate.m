@@ -18,9 +18,6 @@
 
 @implementation AppDelegate
 
-
-@synthesize myAudioPlayer;
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   // Override point for customization after application launch.
   UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
@@ -32,7 +29,7 @@
   MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
   controller.managedObjectContext = self.managedObjectContext;
 
-  [DBT setAPIKey:@"[REPLACEME]"];
+  [DBT setAPIKey:@"1f2bbafcfadc45e8feec9ef4277385e5"];
 
   return YES;
 }
