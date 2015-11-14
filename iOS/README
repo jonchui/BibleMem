@@ -1,0 +1,12 @@
+BibleMem
+Scripture memorization helper with audio repetition.
+Bay Area Hackathon Nov. 2015
+
+After pulling source, be sure to install CocoaPod:
+	Under this directory:
+	"pod install"
+
+Be sure to update the API key ([REPLACEME]) before use of remote API calls:  
+[DBT setAPIKey:@"[REPLACEME]"];
+
+
