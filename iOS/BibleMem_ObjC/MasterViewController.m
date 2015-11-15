@@ -14,10 +14,21 @@
 #import <dbt-sdk/dbt.h>
 #import <dbt-sdk/DBTMediaLocation.h>
 #import <dbt-sdk/DBTAudioPath.h>
+#import <dbt-sdk/DBTAudioVerseStart.h>
 
 @interface MasterViewController ()
 
-@property (nonatomic,strong)    AVPlayer *audioPlayer;
+@property (nonatomic,strong) AVPlayer *audioPlayer;
+
+@property(nonatomic,strong) NSArray *audioVerseStartsHolder;
+
+@property (nonatomic,strong) NSString* book;
+@property (nonatomic,strong) NSNumber* chapter;
+@property float playDuration;
+@property int startingVerse;
+@property int endingVerse;
+
+- (void)startTimedPlayback;
 
 @end
 
@@ -31,6 +42,37 @@
   UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
   self.navigationItem.rightBarButtonItem = addButton;
   self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+
+  // This will come from the user's selection; hard coding for now.
+  _book = @"John";
+  _chapter = @1;
+  _startingVerse = 15;
+  _endingVerse = 17;
+}
+
+- (void)startTimedPlayback {
+
+  float startTimeSeconds = [((DBTAudioVerseStart *)_audioVerseStartsHolder[_startingVerse-1]).verseStart floatValue];
+  CMTime seekTargetTime = CMTimeMakeWithSeconds(startTimeSeconds, NSEC_PER_SEC);
+  [self.audioPlayer seekToTime:seekTargetTime
+               toleranceBefore:kCMTimePositiveInfinity toleranceAfter:kCMTimeZero];
+
+  // For example... sample math for verses 6-8 (endTimeOffset - startTimeOffset: 39.861 - 26.344 = 13.517000)
+  // @todo last verse in chapter needs special handling...
+
+  NSNumber* startTimeOffset = ((DBTAudioVerseStart *)_audioVerseStartsHolder[_startingVerse-1]).verseStart;
+  NSNumber* endTimeOffset = ((DBTAudioVerseStart *)_audioVerseStartsHolder[_endingVerse]).verseStart;
+
+  _playDuration = [endTimeOffset floatValue] - [startTimeOffset floatValue];
+  NSLog(@"endTimeOffset - startTimeOffset: %f", _playDuration);
+
+  verseTimer = [NSTimer scheduledTimerWithTimeInterval:_playDuration
+                                                target:self
+                                              selector:@selector(timerFired:)
+                                              userInfo:nil
+                                               repeats:NO];
+
+  [self.audioPlayer play];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -81,12 +123,14 @@
                      }];
 
   [DBT getAudioVerseStartWithDamId:@"ENGESVN2DA"
-                              book:@"John"
-                           chapter:@1
+                              book:_book
+                           chapter:_chapter
                            success:^(NSArray *audioVerseStarts) {
+                             self.audioVerseStartsHolder = [audioVerseStarts copy];
+
                              NSLog(@"getAudioVerseStartWithDamId result: %@", audioVerseStarts );
                            }
-   failure:^(NSError *error) {
+                           failure:^(NSError *error) {
      NSLog(@"getAudioVerseStartWithDamId failure: %@", error);
    }
    ];
@@ -136,18 +180,7 @@
     }
     else if (self.audioPlayer.status == AVPlayerStatusReadyToPlay)
     {
-      Float64 seconds = 78.132f;  // Verse 15 start
-      CMTime targetTime = CMTimeMakeWithSeconds(seconds, NSEC_PER_SEC);
-      [self.audioPlayer seekToTime:targetTime
-              toleranceBefore:kCMTimePositiveInfinity toleranceAfter:kCMTimeZero];
-
-      verseTimer = [NSTimer scheduledTimerWithTimeInterval:11.424  // Verse 15 duration: 89.556 - 78.132
-                                                target:self
-                                              selector:@selector(timerFired:)
-                                              userInfo:nil
-                                               repeats:NO];
-
-      [self.audioPlayer play];
+      [self startTimedPlayback];
 
     }
     else if (self.audioPlayer.status == AVPlayerItemStatusUnknown)
@@ -309,6 +342,8 @@
   if (theTimer == verseTimer) {
     NSLog(@"timerFired !!! @ %@", [theTimer fireDate]);
     [self.audioPlayer pause];
+
+    [self startTimedPlayback];
   }
 }
 
