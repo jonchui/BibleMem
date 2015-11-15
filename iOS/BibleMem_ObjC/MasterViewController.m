@@ -265,6 +265,8 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 #pragma mark - play pause 
 
 - (void)pausePlayback:(id)sender {
+  [verseTimer invalidate];
+  verseTimer = nil;
   [_audioPlayer pause];
 }
 
