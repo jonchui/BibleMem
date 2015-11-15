@@ -92,7 +92,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   // Do any additional setup after loading the view, typically from a nib.
   self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
-  UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
+  UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pausePlayback:)];
   self.navigationItem.rightBarButtonItem = addButton;
   self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
   
@@ -261,6 +261,10 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 }
 
 #pragma mark - play pause 
+
+- (void)pausePlayback:(id)sender {
+  [_audioPlayer pause];
+}
 
 - (void) setGlobalVariablesHack {
   // TODO fix this - and don't make these global variables.
