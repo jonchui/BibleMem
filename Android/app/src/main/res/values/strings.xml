@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">BibleMem</string>
-    <string name="edit_message">Enter a message</string>
+    <string name="app_name">BibleMem!</string>
+    <string name="edit_message_book">Enter a Bible book name</string>
+    <string name="edit_message_chapter_number">Enter a chapter number</string>
+    <string name="edit_message_verse_number">Enter a verse number</string>
     <string name="button_send">Send</string>
     <string name="action_settings">Settings</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.example.claire.biblemem;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,6 +13,10 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.Application;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import android.os.Handler;
 
 import com.faithcomesbyhearing.dbt.Dbt;
 import com.faithcomesbyhearing.dbt.callback.VerseCallback;
@@ -31,39 +37,56 @@ public class MyActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
-
-        /*
-        Dbt.getLibraryVolume(null, "text", null, "Eng", new VolumeCallback() {
-            @Override
-            public void success(List<Volume> volumes) {
-                Log.i("biblemem", "volumes: " + volumes.iterator().toString());
-            }
-
-            @Override
-            public void failure(Exception e) {
-                Log.i("biblemem", "failure: " + e.getLocalizedMessage());
-            }
-        });
-        Dbt.getTextVerse("EN1NIVN1ET", "John", "3", null, null, new VerseCallback() {
-            @Override
-            public void success(List<Verse> verses) {
-//                AlertDialog alertDialog = new AlertDialog("verses: " + verses.toString());
-                Log.i("biblemem", "verses: " + verses.iterator().toString());
-            }
-
-            @Override
-            public void failure(Exception e) {
-
-            }
         });*/
+
+        Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Perform action on click
+                /*Dbt.getLibraryVolume(null, "text", null, "Eng", new VolumeCallback() {
+                    @Override
+                    public void success(List<Volume> volumes) {
+                        Log.i("biblemem","volumes");
+                    }
+
+                    @Override
+                    public void failure(Exception e) {
+
+                    }
+                });*/
+
+                //Intent intent = new Intent(this, DisplayMessageActivity.class);
+                EditText editTextBook = (EditText) findViewById(R.id.edit_message_book);
+                EditText editTextChapterNumber = (EditText) findViewById(R.id.edit_message_chapter_number);
+                EditText editTextVerseNumber = (EditText) findViewById(R.id.edit_message_verse_number);
+                String messageBook = editTextBook.getText().toString();
+                String messageChapterNumber = editTextChapterNumber.getText().toString();
+                String messageVerseNumber = editTextVerseNumber.getText().toString();
+                Log.i("biblemem", "Book: " + messageBook);
+                Log.i("biblemem", "Chapter Number: " + messageChapterNumber);
+                Log.i("biblemem", "Verse Number: " + messageVerseNumber);
+
+                //Toast.makeText(getApplicationContext(), "Sent! " + messageBook + " " + messageChapterNumber +  " " + messageVerseNumber, Toast.LENGTH_LONG).show();
+
+                final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.john1_engesvn2da);
+                mp.start();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        // Actions to do after 10 seconds
+                        mp.stop();
+                    }
+                }, 10000);
+            }
+        });
     }
 
     @Override
@@ -86,22 +109,5 @@ public class MyActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    /** Called when the user clicks the Send button */
-    public void sendMessage(View view) {
-        // Do something in response to button
-        Dbt.getLibraryVolume(null, "text", null, "Eng", new VolumeCallback() {
-            @Override
-            public void success(List<Volume> volumes) {
-Log.i("biblemem","volumes");
-
-            }
-
-            @Override
-            public void failure(Exception e) {
-
-            }
-        });
     }
 }

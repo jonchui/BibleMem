@@ -3,17 +3,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal" >
-    <EditText android:id="@+id/edit_message"
+    android:orientation="vertical" >
+    <TextView android:text="\n" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="26sp"/>
+    <EditText android:id="@+id/edit_message_book"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/edit_message" />
-    <Button
+        android:hint="@string/edit_message_book" />
+    <EditText android:id="@+id/edit_message_chapter_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_message_chapter_number" />
+    <EditText android:id="@+id/edit_message_verse_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_message_verse_number" />
+    <Button android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="sendMessage"
         android:text="@string/button_send" />
+
 </LinearLayout>
+
 <!--
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
