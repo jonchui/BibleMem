@@ -107,25 +107,29 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
                        }];
 }
 
+// Be careful, this function gets called on a timer, so make sure the code is minimal
 - (void)startTimedPlayback {
-  // ERROR CONDITIONS HERE
-  int zeroIndexedVerse = _startingVerse - 1;
-  if (zeroIndexedVerse > [_audioVerseStartsHolder count] - 1) {
-    zeroIndexedVerse = [_audioVerseStartsHolder count] - 1;
-  }
-  if (_endingVerse > [_audioVerseStartsHolder count] - 1) {
-    _endingVerse = [_audioVerseStartsHolder count] - 1;
-  }
-  // TODO - mixed up?!?! Update the text view
-  if (zeroIndexedVerse == _endingVerse) {
+  // TODO - bring this sanitziation outside somehow, but it's dependant on _audioVerseStartsHolder.
+  // which they only get when they click on "memorize" which downloads the full mp3
+  // Sanitize verses
+  int maxVerseIndex = [_audioVerseStartsHolder count] - 1;
+  // Cap between 1 and maxVerseIndex
+  _startingVerse = MAX(1, MIN(_startingVerse, maxVerseIndex));
+  _endingVerse = MAX(1, MIN(_endingVerse, maxVerseIndex));
+
+  if (_startingVerse == _endingVerse) {
     // Opps, looks like the user chose a bad verse. let's just go to the first verse.
-    [self.verseField setText:@"1"];
-    zeroIndexedVerse = 0;
+    [self.verseField setText:[NSString stringWithFormat:@"%d", _startingVerse]];
   } else {
     [self.verseField setText:[NSString stringWithFormat:@"%d-%d", _startingVerse, _endingVerse]];
   }
+  [self updateReadButtonWithSelectedText];
+  
+  int zeroIndexedVerse = _startingVerse - 1;
+  
   // PLAY AS NORMAL
-  float startTimeSeconds = [((DBTAudioVerseStart *)_audioVerseStartsHolder[zeroIndexedVerse]).verseStart floatValue];
+  float startTimeSeconds =
+      [((DBTAudioVerseStart *)_audioVerseStartsHolder[zeroIndexedVerse]).verseStart floatValue];
   CMTime seekTargetTime = CMTimeMakeWithSeconds(startTimeSeconds, NSEC_PER_SEC);
   [self.audioPlayer seekToTime:seekTargetTime
                toleranceBefore:kCMTimePositiveInfinity toleranceAfter:kCMTimeZero];
