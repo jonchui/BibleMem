@@ -12,7 +12,10 @@
 
 @class DetailViewController;
 
-@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate> {
+@interface MasterViewController : UITableViewController <
+    NSFetchedResultsControllerDelegate,
+    UIPickerViewDelegate,
+    UIPickerViewDataSource> {
   NSTimer *verseTimer;
 }
 
