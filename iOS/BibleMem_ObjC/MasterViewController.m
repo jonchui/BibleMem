@@ -170,6 +170,9 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   [self.chapterPicker reloadAllComponents];
   
   [_verseField setText:@"1"];
+
+  [self updateReadButtonWithSelectedText];
+  [self.listenToVerseButton setEnabled:[self versesValid]];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
@@ -190,15 +193,13 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
           self.verseField.text];
 }
 - (void) updateReadButtonWithSelectedText {
+  [self.listenToVerseButton setEnabled:[self versesValid]];
+
   [self.listenToVerseButton setTitle:[NSString stringWithFormat:@"Memorize %@", [self getVerseAsString]]
                             forState:UIControlStateNormal];
 }
 
 - (IBAction)listenToVerseButtonPressed {
-  // TODO
-  _book = [self selectedBook].bookId;
-  _chapter = [NSNumber numberWithInt:[self getSelectedChapterInt]];
-  [self parseOutVerseFieldToStartAndEnd];
   [self insertNewObject:self];
 }
 
@@ -253,17 +254,42 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 }
 
+// TODO - do better validation, like verses, etc.
+- (BOOL)versesValid {
+  if (![self selectedBook] || !self.books || self.books.count == 0 ) {
+    return false;
+  }
+  return true;
+}
+
 #pragma mark - Core Data
 
 - (void)insertNewObject:(id)sender {
+  // TODO fix this - and don't make these global variables.
+  _book = [self selectedBook].bookId;
+  _chapter = [NSNumber numberWithInt:[self getSelectedChapterInt]];
+  _startingVerse = [self.verseField.text integerValue];
+  _endingVerse = _startingVerse;
+  
+  // let's do validation here, before we save to core data and crash
+  if (![self versesValid]) {
+    // Opps, we cannot do anything, so just quite
+    return;
+  }
+  
   NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
   NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
   NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-      
+  
   // If appropriate, configure the new managed object.
   // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
   [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-
+  [newManagedObject setValue:_book forKey:@"bookId"];
+  [newManagedObject setValue:_chapter forKey:@"chapter"];
+  [newManagedObject setValue:[NSNumber numberWithInteger:_startingVerse] forKey:@"startingVerse"];
+  [newManagedObject setValue:[NSNumber numberWithInteger:_endingVerse] forKey:@"endingVerse"];
+  [newManagedObject setValue:[self getVerseAsString] forKey:@"displayString"];
+  
   // Save the context.
   NSError *error = nil;
   if (![context save:&error]) {
@@ -412,7 +438,7 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
   NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-  cell.textLabel.text = [[object valueForKey:@"timeStamp"] description];
+  cell.textLabel.text = [[object valueForKey:@"displayString"] description];
 }
 
 #pragma mark - Fetched results controller
