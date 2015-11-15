@@ -16,6 +16,8 @@
 #import <dbt-sdk/DBTAudioPath.h>
 #import <dbt-sdk/DBTAudioVerseStart.h>
 
+#import "NSManagedObjects/Event.h"
+
 @interface MasterViewController ()
 
 @property (nonatomic, strong) AVPlayer *audioPlayer;
@@ -337,16 +339,17 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   
   NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
   NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-  NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+  Event *newEvent = (Event *)[NSEntityDescription insertNewObjectForEntityForName:[entity name]
+                                                                inManagedObjectContext:context];
   
   // If appropriate, configure the new managed object.
   // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-  [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-  [newManagedObject setValue:_book forKey:@"bookId"];
-  [newManagedObject setValue:_chapter forKey:@"chapter"];
-  [newManagedObject setValue:[NSNumber numberWithInteger:_startingVerse] forKey:@"startingVerse"];
-  [newManagedObject setValue:[NSNumber numberWithInteger:_endingVerse] forKey:@"endingVerse"];
-  [newManagedObject setValue:[self getVerseAsString] forKey:@"displayString"];
+  newEvent.timeStamp = [NSDate date];
+  newEvent.bookId = _book;
+  newEvent.chapter = _chapter;
+  newEvent.startingVerse = [NSNumber numberWithInteger:_startingVerse];
+  newEvent.endingVerse = [NSNumber numberWithInteger:_endingVerse];
+  newEvent.displayString = [self getVerseAsString];
   
   // Save the context.
   NSError *error = nil;

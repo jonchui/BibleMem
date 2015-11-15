@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
+   <Group
+      location = "container:"
+      name = "NSManagedObjects">
+      <FileRef
+         location = "group:BibleMem_ObjC/NSManagedObjects/Event+CoreDataProperties.h">
+      </FileRef>
+      <FileRef
+         location = "group:BibleMem_ObjC/NSManagedObjects/Event+CoreDataProperties.m">
+      </FileRef>
+      <FileRef
+         location = "group:BibleMem_ObjC/NSManagedObjects/Event.h">
+      </FileRef>
+      <FileRef
+         location = "group:BibleMem_ObjC/NSManagedObjects/Event.m">
+      </FileRef>
+      <FileRef
+         location = "group:BibleMem_ObjC/NSManagedObjects/Verse+CoreDataProperties.h">
+      </FileRef>
+      <FileRef
+         location = "group:BibleMem_ObjC/NSManagedObjects/Verse+CoreDataProperties.m">
+      </FileRef>
+      <FileRef
+         location = "group:BibleMem_ObjC/NSManagedObjects/Verse.h">
+      </FileRef>
+      <FileRef
+         location = "group:BibleMem_ObjC/NSManagedObjects/Verse.m">
+      </FileRef>
+   </Group>
    <FileRef
       location = "group:BibleMem_ObjC.xcodeproj">
    </FileRef>

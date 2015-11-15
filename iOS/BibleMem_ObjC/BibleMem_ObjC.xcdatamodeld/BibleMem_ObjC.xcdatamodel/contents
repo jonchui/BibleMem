@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="8195" systemVersion="14F27" minimumToolsVersion="Automatic">
-    <entity name="Event">
+    <entity name="Event" representedClassName="Event">
         <attribute name="bookId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="chapter" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="displayString" optional="YES" attributeType="String" syncable="YES"/>
@@ -9,9 +9,17 @@
         <attribute name="timeStamp" optional="YES" attributeType="Date">
             <userInfo/>
         </attribute>
+        <relationship name="verses" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Verse" syncable="YES"/>
         <userInfo/>
     </entity>
+    <entity name="Verse" representedClassName="Verse" syncable="YES">
+        <attribute name="book" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="chapter" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="verseNumber" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+    </entity>
     <elements>
-        <element name="Event" positionX="-101" positionY="-231" width="128" height="133"/>
+        <element name="Event" positionX="-101" positionY="-231" width="128" height="150"/>
+        <element name="Verse" positionX="-99" positionY="-180" width="128" height="105"/>
     </elements>
 </model>
