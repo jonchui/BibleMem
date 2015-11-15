@@ -290,6 +290,7 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   // TODO fix this - and don't make these global variables.
   _book = [self selectedBook].bookId;
   _chapter = [NSNumber numberWithInt:[self getSelectedChapterInt]];
+  [_verseField resignFirstResponder];
   NSArray *ints = [self.verseField.text componentsSeparatedByString: @"-"];
   if ([ints count] < 2) {
     _startingVerse = [self.verseField.text integerValue];
