@@ -108,8 +108,24 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 }
 
 - (void)startTimedPlayback {
-
-  float startTimeSeconds = [((DBTAudioVerseStart *)_audioVerseStartsHolder[_startingVerse-1]).verseStart floatValue];
+  // ERROR CONDITIONS HERE
+  int zeroIndexedVerse = _startingVerse - 1;
+  if (zeroIndexedVerse > [_audioVerseStartsHolder count] - 1) {
+    zeroIndexedVerse = [_audioVerseStartsHolder count] - 1;
+  }
+  if (_endingVerse > [_audioVerseStartsHolder count] - 1) {
+    _endingVerse = [_audioVerseStartsHolder count] - 1;
+  }
+  // TODO - mixed up?!?! Update the text view
+  if (zeroIndexedVerse == _endingVerse) {
+    // Opps, looks like the user chose a bad verse. let's just go to the first verse.
+    [self.verseField setText:@"1"];
+    zeroIndexedVerse = 0;
+  } else {
+    [self.verseField setText:[NSString stringWithFormat:@"%d-%d", _startingVerse, _endingVerse]];
+  }
+  // PLAY AS NORMAL
+  float startTimeSeconds = [((DBTAudioVerseStart *)_audioVerseStartsHolder[zeroIndexedVerse]).verseStart floatValue];
   CMTime seekTargetTime = CMTimeMakeWithSeconds(startTimeSeconds, NSEC_PER_SEC);
   [self.audioPlayer seekToTime:seekTargetTime
                toleranceBefore:kCMTimePositiveInfinity toleranceAfter:kCMTimeZero];
@@ -119,7 +135,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 
   NSAssert(_audioVerseStartsHolder != nil, @"this should not be nil");
   
-  NSNumber* startTimeOffset = ((DBTAudioVerseStart *)_audioVerseStartsHolder[_startingVerse-1]).verseStart;
+  NSNumber* startTimeOffset = ((DBTAudioVerseStart *)_audioVerseStartsHolder[zeroIndexedVerse]).verseStart;
   NSNumber* endTimeOffset = ((DBTAudioVerseStart *)_audioVerseStartsHolder[_endingVerse]).verseStart;
 
   _playDuration = [endTimeOffset floatValue] - [startTimeOffset floatValue];
