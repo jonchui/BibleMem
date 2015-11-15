@@ -203,12 +203,6 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   [self insertNewObject:self];
 }
 
-// TODO(ebcdev): parse out
-- (void)parseOutVerseFieldToStartAndEnd {
-  _startingVerse = [self.verseField.text integerValue];
-  _endingVerse = _startingVerse;
-}
-
 - (void)textFieldDidChange :(UITextField *)textField{
   NSLog( @"text changed: %@", textField.text);
   [self updateReadButtonWithSelectedText];
@@ -268,9 +262,14 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   // TODO fix this - and don't make these global variables.
   _book = [self selectedBook].bookId;
   _chapter = [NSNumber numberWithInt:[self getSelectedChapterInt]];
-  _startingVerse = [self.verseField.text integerValue];
-  _endingVerse = _startingVerse;
-  
+  NSArray *ints = [self.verseField.text componentsSeparatedByString: @"-"];
+  if ([ints count] == 0) {
+    _startingVerse = [self.verseField.text integerValue];
+    _endingVerse = _startingVerse;
+  } else {
+    _startingVerse = [((NSString *)ints[0]) integerValue];
+    _endingVerse = [((NSString *)ints[1]) integerValue];
+  }
   // let's do validation here, before we save to core data and crash
   if (![self versesValid]) {
     // Opps, we cannot do anything, so just quite
