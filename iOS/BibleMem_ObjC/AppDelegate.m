@@ -29,7 +29,8 @@
   MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
   controller.managedObjectContext = self.managedObjectContext;
 
-  [DBT setAPIKey:@"[REPLACEME]"];
+  @error replace this API key with one from https://www.digitalbibleplatform.com
+  [DBT setAPIKey:@"REPLACE_ME_WITH_API_KEY"];
 
   return YES;
 }
