@@ -212,6 +212,16 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 
 - (IBAction)listenToVerseButtonPressed {
   // TODO
+  _book = [self selectedBook].bookName;
+  _chapter = [NSNumber numberWithInt:[self getSelectedChapterInt]];
+  [self parseOutVerseFieldToStartAndEnd];
+  [self insertNewObject:self];
+}
+
+// TODO(ebcdev): parse out
+- (void)parseOutVerseFieldToStartAndEnd {
+  _startingVerse = [self.verseField.text integerValue];
+  _endingVerse = _startingVerse;
 }
 
 - (void)textFieldDidChange :(UITextField *)textField{
@@ -252,8 +262,11 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   return selectedRow == -1 ? nil : self.books[selectedRow];
 }
 
+- (NSInteger) getSelectedChapterInt {
+  return [self.chapterPicker selectedRowInComponent:0] + 1;
+}
 - (NSString *) getSelectedChapterString {
-return [NSString stringWithFormat:@"%d", [self.chapterPicker selectedRowInComponent:0] + 1] ;
+return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 }
 
 #pragma mark - Core Data
@@ -266,9 +279,6 @@ return [NSString stringWithFormat:@"%d", [self.chapterPicker selectedRowInCompon
   // If appropriate, configure the new managed object.
   // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
   [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-
-  [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-
 
   // Save the context.
   NSError *error = nil;
