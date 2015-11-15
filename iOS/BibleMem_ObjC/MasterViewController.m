@@ -74,7 +74,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 - (void)viewDidLoad {
   [super viewDidLoad];
   // TODO: in future let users chose this
-  self.damId = @"ENGESVN2ET";
+  self.damId = @"ENGESVN2DA";
   
   // update picker delegate & data sources
   _chapterPicker.delegate = self;
