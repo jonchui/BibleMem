@@ -85,6 +85,10 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
                 action:@selector(textFieldDidChange:)
       forControlEvents:UIControlEventEditingChanged];
   
+  // setup tableview
+  _versesTableView.delegate = self;
+  _versesTableView.dataSource = self;
+  
   // Do any additional setup after loading the view, typically from a nib.
   self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
@@ -256,9 +260,9 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   return true;
 }
 
-#pragma mark - Core Data
+#pragma mark - play pause 
 
-- (void)insertNewObject:(id)sender {
+- (void) setGlobalVariablesHack {
   // TODO fix this - and don't make these global variables.
   _book = [self selectedBook].bookId;
   _chapter = [NSNumber numberWithInt:[self getSelectedChapterInt]];
@@ -270,6 +274,34 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
     _startingVerse = [((NSString *)ints[0]) integerValue];
     _endingVerse = [((NSString *)ints[1]) integerValue];
   }
+}
+
+- (void) playGlobalVariablesHack {
+  // let's do validation here, before we save to core data and crash
+  if (![self versesValid]) {
+    // Opps, we cannot do anything, so just quite
+    return;
+  }
+  
+  [DBT getAudioVerseStartWithDamId:self.damId
+                              book:_book
+                           chapter:_chapter
+                           success:^(NSArray *audioVerseStarts) {
+                             self.audioVerseStartsHolder = [audioVerseStarts copy];
+                             [self playAudioAfterAudioStartsHolderIsSet];
+                             NSLog(@"getAudioVerseStartWithDamId result: %@", audioVerseStarts );
+                           }
+                           failure:^(NSError *error) {
+                             NSLog(@"getAudioVerseStartWithDamId failure: %@", error);
+                           }
+   ];
+}
+
+#pragma mark - Core Data
+
+- (void)insertNewObject:(id)sender {
+  [self setGlobalVariablesHack];
+  
   // let's do validation here, before we save to core data and crash
   if (![self versesValid]) {
     // Opps, we cannot do anything, so just quite
@@ -297,19 +329,6 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
       NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
       abort();
   }
-  
-  [DBT getAudioVerseStartWithDamId:self.damId
-                              book:_book
-                           chapter:_chapter
-                           success:^(NSArray *audioVerseStarts) {
-                             self.audioVerseStartsHolder = [audioVerseStarts copy];
-                             [self playAudioAfterAudioStartsHolderIsSet];
-                             NSLog(@"getAudioVerseStartWithDamId result: %@", audioVerseStarts );
-                           }
-                           failure:^(NSError *error) {
-                             NSLog(@"getAudioVerseStartWithDamId failure: %@", error);
-                           }
-   ];
 }
 
 - (void)playAudioAfterAudioStartsHolderIsSet {
@@ -438,6 +457,24 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
   NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
   cell.textLabel.text = [[object valueForKey:@"displayString"] description];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+  NSManagedObject *history = [self getSelectedCoreDataObjectOrNil];
+  // set global state, ugh....
+  _book = [history valueForKey:@"bookId"];
+  _chapter = [history valueForKey:@"chapter"];
+  _startingVerse = [[history valueForKey:@"startingVerse"] integerValue];
+  _endingVerse = [[history valueForKey:@"endingVerse"] integerValue];
+  [self playGlobalVariablesHack];
+}
+
+- (NSManagedObject *)getSelectedCoreDataObjectOrNil {
+  NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+  if (!indexPath) {
+    return nil;
+  }
+  return [[self fetchedResultsController] objectAtIndexPath:indexPath];
 }
 
 #pragma mark - Fetched results controller
