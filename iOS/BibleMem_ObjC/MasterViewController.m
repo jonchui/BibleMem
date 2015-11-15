@@ -74,7 +74,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 - (void)viewDidLoad {
   [super viewDidLoad];
   // TODO: in future let users chose this
-  self.damId = @"ENGESVN2ET";
+  self.damId = @"ENGESVN2DA";
   
   // update picker delegate & data sources
   _chapterPicker.delegate = self;
@@ -91,24 +91,6 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
   self.navigationItem.rightBarButtonItem = addButton;
   self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
-
-  // This will come from the user's selection; hard coding for now.
-  _book = @"John";
-  _chapter = @1;
-  _startingVerse = 15;
-  _endingVerse = 17;
-
-// TODO JON - do we even need this? 
-  // See all possible versions
-  [DBT getLibraryVolumeWithDamID:nil
-                    languageCode:@"ENG"
-                           media:@"text"
-                         success:^(NSArray *volumes) {
-                           NSLog(@"Volumes %@", volumes);
-                           self.volumes = volumes;
-                         } failure:^(NSError *error) {
-                           NSLog(@"Error: %@", error);
-                         }];
   
   // Download all books and populate as needed
   [DBT getLibraryBookWithDamId:self.damId
@@ -131,6 +113,8 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   // For example... sample math for verses 6-8 (endTimeOffset - startTimeOffset: 39.861 - 26.344 = 13.517000)
   // @todo last verse in chapter needs special handling...
 
+  NSAssert(_audioVerseStartsHolder != nil, @"this should not be nil");
+  
   NSNumber* startTimeOffset = ((DBTAudioVerseStart *)_audioVerseStartsHolder[_startingVerse-1]).verseStart;
   NSNumber* endTimeOffset = ((DBTAudioVerseStart *)_audioVerseStartsHolder[_endingVerse]).verseStart;
 
@@ -289,43 +273,28 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
       abort();
   }
   
-  [DBT getTextVerseWithDamId:self.damId
-                        book:@"John"
-                     chapter:@3
-                  verseStart:@1
-                    verseEnd:@1
-                     success:^(NSArray *verses) {
-//                       NSLog(@"Verse: %@", );
-                       AVSpeechSynthesizer *synthesizer = [[AVSpeechSynthesizer alloc]init];
-                       AVSpeechUtterance *utterance = [AVSpeechUtterance speechUtteranceWithString:((DBTVerse *)[verses objectAtIndex:0]).verseText];
-                       [utterance setRate:0.5f];
-                       [utterance setPitchMultiplier:2];
-//                       [synthesizer speakUtterance:utterance];
-                     } failure:^(NSError *error) {
-                       NSLog(@"Error: %@", error);
-                     }];
-
   [DBT getAudioVerseStartWithDamId:self.damId
                               book:_book
                            chapter:_chapter
                            success:^(NSArray *audioVerseStarts) {
                              self.audioVerseStartsHolder = [audioVerseStarts copy];
-
+                             [self playAudioAfterAudioStartsHolderIsSet];
                              NSLog(@"getAudioVerseStartWithDamId result: %@", audioVerseStarts );
                            }
                            failure:^(NSError *error) {
-     NSLog(@"getAudioVerseStartWithDamId failure: %@", error);
-   }
+                             NSLog(@"getAudioVerseStartWithDamId failure: %@", error);
+                           }
    ];
+}
 
-
+- (void)playAudioAfterAudioStartsHolderIsSet {
   [DBT getAudioLocation:@"http"
                 success:^(NSArray *audioLocations) {
                   if(audioLocations.count) {
                     DBTMediaLocation *location = audioLocations[0];
-                    [DBT getAudioPathWithDamId:@"ENGESVN2DA"
-                                          book:@"John"
-                                       chapter:@1
+                    [DBT getAudioPathWithDamId:self.damId
+                                          book:_book
+                                       chapter:_chapter
                                        success:^(NSArray *audioPaths) {
                                          NSLog(@"paths %@", audioPaths);
                                          if(audioPaths.count) {
@@ -333,14 +302,14 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
                                            NSString *urlString = [NSString stringWithFormat:@"%@/%@",location.baseURL,audioPath.path];
                                            NSURL *url = [NSURL URLWithString:urlString];
                                            NSLog(@"Audio file URL: %@", url);
-
+                                           
                                            AVPlayer *player = [[AVPlayer alloc]initWithURL:url];
                                            _audioPlayer= player;
                                            [_audioPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
-
-
+                                           
+                                           
                                            NSLog(@"After play: %@", urlString);
-
+                                           
                                          }
                                        } failure:^(NSError *error) {
                                          NSLog(@"Audio Path Error: %@", error);
@@ -349,7 +318,6 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
                 } failure:^(NSError *error) {
                   NSLog(@"Audio Location Error: %@", error);
                 }];
-
 
 }
 

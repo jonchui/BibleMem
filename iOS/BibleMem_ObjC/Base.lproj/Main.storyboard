@@ -93,7 +93,7 @@
                                     <textInputTraits key="textInputTraits"/>
                                 </textField>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Book:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qVu-rB-vWm">
-                                    <rect key="frame" x="8" y="76" width="44" height="21"/>
+                                    <rect key="frame" x="74" y="0.0" width="44" height="21"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
@@ -105,13 +105,10 @@
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nYW-fT-BwI">
-                                    <rect key="frame" x="36" y="0.0" width="194" height="175"/>
-                                </pickerView>
-                                <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cfJ-xQ-J4B">
-                                    <rect key="frame" x="283" y="0.0" width="92" height="175"/>
+                                    <rect key="frame" x="-6" y="16" width="194" height="148"/>
                                 </pickerView>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Chp:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FNm-Qj-yia">
-                                    <rect key="frame" x="238" y="79" width="37" height="21"/>
+                                    <rect key="frame" x="208" y="0.0" width="37" height="21"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
@@ -126,6 +123,9 @@
                                         <action selector="listenToVerseButtonPressed" destination="7bK-jq-Zjz" eventType="touchUpInside" id="yRa-SX-z8g"/>
                                     </connections>
                                 </button>
+                                <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cfJ-xQ-J4B">
+                                    <rect key="frame" x="186" y="0.0" width="92" height="175"/>
+                                </pickerView>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <constraints>
@@ -158,7 +158,7 @@
                             <outlet property="delegate" destination="7bK-jq-Zjz" id="RA6-mI-bju"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Yo! Vdoerse(s) to memorize?" id="Zdf-7t-Un8"/>
+                    <navigationItem key="navigationItem" title="Yo! Vderse(s) to memorize?" id="Zdf-7t-Un8"/>
                     <connections>
                         <outlet property="booksPicker" destination="nYW-fT-BwI" id="Lpg-GE-Y7c"/>
                         <outlet property="chapterPicker" destination="cfJ-xQ-J4B" id="opg-pW-f0Z"/>
