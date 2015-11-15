@@ -196,7 +196,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 
 - (IBAction)listenToVerseButtonPressed {
   // TODO
-  _book = [self selectedBook].bookName;
+  _book = [self selectedBook].bookId;
   _chapter = [NSNumber numberWithInt:[self getSelectedChapterInt]];
   [self parseOutVerseFieldToStartAndEnd];
   [self insertNewObject:self];
@@ -303,22 +303,33 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
                                            NSURL *url = [NSURL URLWithString:urlString];
                                            NSLog(@"Audio file URL: %@", url);
                                            
+                                           [self cleanupOldAudioPlayer];
                                            AVPlayer *player = [[AVPlayer alloc]initWithURL:url];
-                                           _audioPlayer= player;
+                                           _audioPlayer = player;
                                            [_audioPlayer addObserver:self forKeyPath:@"status" options:0 context:nil];
-                                           
                                            
                                            NSLog(@"After play: %@", urlString);
                                            
                                          }
                                        } failure:^(NSError *error) {
+                                         [_audioPlayer pause];
+                                         [self cleanupOldAudioPlayer];
                                          NSLog(@"Audio Path Error: %@", error);
                                        }];
                   }
                 } failure:^(NSError *error) {
                   NSLog(@"Audio Location Error: %@", error);
+                  [_audioPlayer pause];
+                  [self cleanupOldAudioPlayer];
                 }];
 
+}
+
+// CLEANUP audioplaye before we nil it out, is there way around this?
+- (void)cleanupOldAudioPlayer {
+  [_audioPlayer pause];
+  [_audioPlayer removeObserver:self forKeyPath:@"status"];
+  _audioPlayer = nil;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
