@@ -204,7 +204,9 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 }
 
 - (IBAction)listenToVerseButtonPressed {
+  [self setGlobalVariablesHack];
   [self insertNewObject:self];
+  [self playGlobalVariablesHack];
 }
 
 - (void)textFieldDidChange :(UITextField *)textField{
@@ -271,7 +273,7 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   _book = [self selectedBook].bookId;
   _chapter = [NSNumber numberWithInt:[self getSelectedChapterInt]];
   NSArray *ints = [self.verseField.text componentsSeparatedByString: @"-"];
-  if ([ints count] == 0) {
+  if ([ints count] < 2) {
     _startingVerse = [self.verseField.text integerValue];
     _endingVerse = _startingVerse;
   } else {
@@ -304,8 +306,6 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 #pragma mark - Core Data
 
 - (void)insertNewObject:(id)sender {
-  [self setGlobalVariablesHack];
-  
   // let's do validation here, before we save to core data and crash
   if (![self versesValid]) {
     // Opps, we cannot do anything, so just quite
