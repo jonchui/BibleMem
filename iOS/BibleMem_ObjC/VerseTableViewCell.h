@@ -10,6 +10,4 @@
 
 @interface VerseTableViewCell : UITableViewCell
 
-@property (strong, nonatomic) IBOutlet UITextView *versesTextView;
-
 @end

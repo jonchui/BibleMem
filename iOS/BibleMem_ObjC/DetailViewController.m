@@ -81,16 +81,31 @@
   
   if ([self hasDownloadedVerseData]) {
     DBTVerse *verse = (DBTVerse *)[self.verses objectAtIndex:indexPath.row];
-    cell.textLabel.text = verse.verseText;
-    UITextView *textView = (UITextView *)[cell.contentView viewWithTag:100];
-    if (!textView) {
-      textView.text = verse.verseText;
-    }
+    cell.textLabel.text = [verse.verseText stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    cell.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    [cell.textLabel setNumberOfLines:0];
+//    DOES NOT WORK YET
+//    UITextView *textView = (UITextView *)[cell.contentView viewWithTag:100];
+//    if (!textView) {
+//      textView.text = verse.verseText;
+//    }
   } else {
     cell.textLabel.text = @"Downloading... ";
   }
 }
 
+//- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+//  if ([self hasDownloadedVerseData]) {
+//    DBTVerse *verse = (DBTVerse *)[self.verses objectAtIndex:indexPath.row];
+//    NSString *verseText = verse.verseText;
+//    CGFloat width = ((CGRect)[self.tableView bounds]).size.width;
+//    NSAssert(width > 0, @"uh oh , width should be > 0");
+//    CGSize size = [verseText sizeWithFont:[UIFont systemFontOfSize:[UIFont systemFontSize]] forWidth:width lineBreakMode:NSLineBreakByWordWrapping];
+//    return size.height;
+//  } else {
+//    return 40.0f;
+//  }
+//}
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 
 }
@@ -102,6 +117,10 @@
   
   [self.tableView registerClass:VerseTableViewCell.class forCellReuseIdentifier:@"VerseCell"];
   // Do any additional setup after loading the view, typically from a nib.
+  
+  self.tableView.estimatedRowHeight = 500.0;
+  self.tableView.rowHeight = UITableViewAutomaticDimension;
+  
   [self configureView];
 }
 
