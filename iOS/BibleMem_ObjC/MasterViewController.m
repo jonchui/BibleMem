@@ -264,7 +264,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 }
 
 // returns the selected chapter, can be null if no book is selected, or no books are available.
-- (__nullable DBTBook*) selectedBook {
+- (DBTBook* _Nullable ) selectedBook {
   NSInteger selectedRow = [self.booksPicker selectedRowInComponent:0];
   return selectedRow == -1 ? nil : self.books[selectedRow];
 }
@@ -439,9 +439,9 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   if ([[segue identifier] isEqualToString:@"showDetail"]) {
       NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-      NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+      Event *event = (Event *)[[self fetchedResultsController] objectAtIndexPath:indexPath];
       DetailViewController *controller = (DetailViewController *)[[segue destinationViewController] topViewController];
-      [controller setDetailItem:object];
+      [controller setEvent:event];
       controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
       controller.navigationItem.leftItemsSupplementBackButton = YES;
   }
@@ -497,6 +497,13 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   _startingVerse = [[history valueForKey:@"startingVerse"] integerValue];
   _endingVerse = [[history valueForKey:@"endingVerse"] integerValue];
   [self playGlobalVariablesHack];
+  
+  Event *event = (Event *)[[self fetchedResultsController] objectAtIndexPath:indexPath];
+  DetailViewController *controller = [[DetailViewController alloc] initWithEvent:event];
+  [controller setEvent:event];
+  controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+  controller.navigationItem.leftItemsSupplementBackButton = YES;
+  [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (NSManagedObject *)getSelectedCoreDataObjectOrNil {

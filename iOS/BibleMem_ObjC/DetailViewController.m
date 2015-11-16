@@ -7,29 +7,47 @@
 //
 
 #import "DetailViewController.h"
+#import <dbt-sdk/dbt.h>
 
 @interface DetailViewController ()
+
+@property NSArray *verses;
 
 @end
 
 @implementation DetailViewController
 
+- (id)initWithEvent:(Event *)event {
+  [self setEvent:event];
+   return [super init];
+}
 #pragma mark - Managing the detail item
 
-- (void)setDetailItem:(id)newDetailItem {
-  if (_detailItem != newDetailItem) {
-      _detailItem = newDetailItem;
-          
-      // Update the view.
-      [self configureView];
+- (void)setEvent:(Event *)event {
+  if (_event != event) {
+      _event = event;
+    
+      // Download data
+    [DBT getTextVerseWithDamId:@"ENGESVN2ET"
+                          book:_event.bookId
+                       chapter:_event.chapter
+                    verseStart:_event.startingVerse
+                      verseEnd:_event.endingVerse
+                       success:^(NSArray *verses) {
+                         NSLog(@"Verses: %@", verses);
+                         self.verses = verses;
+                         // Update the view.
+                         [self configureView];
+                       } failure:^(NSError *error) {
+                         NSLog(@"Error: %@", error);
+                       }];
+  
   }
 }
 
 - (void)configureView {
   // Update the user interface for the detail item.
-  if (self.detailItem) {
-      self.detailDescriptionLabel.text = [[self.detailItem valueForKey:@"timeStamp"] description];
-  }
+  [self.tableView reloadData];
 }
 
 - (void)viewDidLoad {

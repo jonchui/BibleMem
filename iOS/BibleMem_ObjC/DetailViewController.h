@@ -7,11 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NSManagedObjects/Event.h"
 
-@interface DetailViewController : UIViewController
+@interface DetailViewController : UITableViewController
 
-@property (strong, nonatomic) id detailItem;
+@property (strong, nonatomic) Event *event;
 @property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
+
+- (id)initWithEvent:(Event *)event;
 
 @end
 
