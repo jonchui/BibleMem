@@ -7,11 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NSManagedObjects/Event.h"
 
-@interface DetailViewController : UIViewController
+@protocol VerseAudioPlayerDelegate
+@required
+-(void)pause;
+-(void)play;
+-(BOOL)isPlaying;
+@end
 
-@property (strong, nonatomic) id detailItem;
+@interface DetailViewController : UITableViewController
+
+@property (strong, nonatomic) Event *event;
 @property (weak, nonatomic) IBOutlet UILabel *detailDescriptionLabel;
+
+- (id)initWithEvent:(Event *)event;
+
+@property(assign, nullable) id<VerseAudioPlayerDelegate> verseAudioPlayerDelegate;
 
 @end
 

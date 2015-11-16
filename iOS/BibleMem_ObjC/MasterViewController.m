@@ -16,6 +16,8 @@
 #import <dbt-sdk/DBTAudioPath.h>
 #import <dbt-sdk/DBTAudioVerseStart.h>
 
+#import "NSManagedObjects/Event.h"
+
 @interface MasterViewController ()
 
 @property (nonatomic, strong) AVPlayer *audioPlayer;
@@ -45,6 +47,17 @@
 @property float playDuration;
 @property int startingVerse;
 @property int endingVerse;
+
+// Necessary to know if we've pushed "play" but timer might not be set yet.
+// so that we can show play button in next view.
+// reset whenever we press stop or pause.
+@property (nonatomic, assign) BOOL justPushedPlayButton;
+
+// TODO: rip this out into a comon view controller, so we can use it in DetailViewController too
+@property (nonatomic,strong) UIBarButtonItem *playButton;
+@property (nonatomic,strong) UIBarButtonItem *pauseButton;
+
+- (void)updatePlayButtonState;
 
 - (void)startTimedPlayback;
 
@@ -92,8 +105,10 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   // Do any additional setup after loading the view, typically from a nib.
   self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
-  UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pausePlayback:)];
-  self.navigationItem.rightBarButtonItem = addButton;
+  _pauseButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(togglePlayback:)];
+  _playButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(togglePlayback:)];
+  [self updatePlayButtonState];
+  
   self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
   
   // Download all books and populate as needed
@@ -105,6 +120,14 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
                        } failure:^(NSError *error) {
                          NSLog(@"Error: %@", error);
                        }];
+}
+
+- (void)updatePlayButtonState {
+  if ([self isPlaying]) {
+    self.navigationItem.rightBarButtonItem = _pauseButton;
+  } else {
+    self.navigationItem.rightBarButtonItem = _playButton;
+  }
 }
 
 // Be careful, this function gets called on a timer, so make sure the code is minimal
@@ -123,6 +146,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   } else {
     [self.verseField setText:[NSString stringWithFormat:@"%d-%d", _startingVerse, _endingVerse]];
   }
+  [self updatePlayButtonState];
   [self updateReadButtonWithSelectedText];
   
   int zeroIndexedVerse = _startingVerse - 1;
@@ -145,13 +169,23 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   _playDuration = [endTimeOffset floatValue] - [startTimeOffset floatValue];
   NSLog(@"endTimeOffset - startTimeOffset: %f", _playDuration);
 
+  [self createTimerAndPlay];
+}
+
+- (void) createTimerAndPlay {
+  if (verseTimer != nil) {
+    [self pause];
+  }
+  
   verseTimer = [NSTimer scheduledTimerWithTimeInterval:_playDuration
+                
                                                 target:self
                                               selector:@selector(timerFired:)
                                               userInfo:nil
                                                repeats:NO];
-
+  
   [self.audioPlayer play];
+  [self updatePlayButtonState];
 }
 
 - (void)saveVolumesAndBooksForEnglishToFile {
@@ -197,6 +231,8 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 
   [self updateReadButtonWithSelectedText];
   [self.listenToVerseButton setEnabled:[self versesValid]];
+  
+  [self updatePlayButtonState];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
@@ -262,7 +298,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 }
 
 // returns the selected chapter, can be null if no book is selected, or no books are available.
-- (__nullable DBTBook*) selectedBook {
+- (DBTBook* _Nullable ) selectedBook {
   NSInteger selectedRow = [self.booksPicker selectedRowInComponent:0];
   return selectedRow == -1 ? nil : self.books[selectedRow];
 }
@@ -274,7 +310,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 }
 
-// TODO - do better validation, like verses, etc.
+// TODO - do better validation, like verses, etc. This is more like has books
 - (BOOL)versesValid {
   if (![self selectedBook] || !self.books || self.books.count == 0 ) {
     return false;
@@ -284,10 +320,45 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 
 #pragma mark - play pause 
 
-- (void)pausePlayback:(id)sender {
+- (void)pause {
   [verseTimer invalidate];
   verseTimer = nil;
   [_audioPlayer pause];
+  _justPushedPlayButton = NO;
+}
+
+- (void)play {
+  if ([self fullScriptureReferenceSet]) {
+    [self createTimerAndPlay];    
+  } else {
+    [self listenToVerseButtonPressed];
+  }
+
+}
+
+- (BOOL)isPlaying {
+  // TODO - fix this to be more robust. an actual play/puase thing
+  return _justPushedPlayButton || verseTimer != nil;
+}
+
+- (BOOL)fullScriptureReferenceSet {
+  return [self globalVaraiblesHackSet]
+    && [self selectedBook]
+    && [self getSelectedChapterInt] > 0
+    && [self versesValid];
+}
+
+- (BOOL)globalVaraiblesHackSet {
+  return _book && _chapter && _startingVerse &&_endingVerse;
+}
+
+- (void)togglePlayback:(id)sender {
+  if ([self isPlaying]) {
+    [self pause];
+  } else {
+    [self play];
+  }
+  [self updatePlayButtonState];
 }
 
 - (void) setGlobalVariablesHack {
@@ -337,16 +408,17 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   
   NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
   NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-  NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+  Event *newEvent = (Event *)[NSEntityDescription insertNewObjectForEntityForName:[entity name]
+                                                                inManagedObjectContext:context];
   
   // If appropriate, configure the new managed object.
   // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-  [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-  [newManagedObject setValue:_book forKey:@"bookId"];
-  [newManagedObject setValue:_chapter forKey:@"chapter"];
-  [newManagedObject setValue:[NSNumber numberWithInteger:_startingVerse] forKey:@"startingVerse"];
-  [newManagedObject setValue:[NSNumber numberWithInteger:_endingVerse] forKey:@"endingVerse"];
-  [newManagedObject setValue:[self getVerseAsString] forKey:@"displayString"];
+  newEvent.timeStamp = [NSDate date];
+  newEvent.bookId = _book;
+  newEvent.chapter = _chapter;
+  newEvent.startingVerse = [NSNumber numberWithInteger:_startingVerse];
+  newEvent.endingVerse = [NSNumber numberWithInteger:_endingVerse];
+  newEvent.displayString = [self getVerseAsString];
   
   // Save the context.
   NSError *error = nil;
@@ -431,18 +503,18 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 }
 
 
-#pragma mark - Segues
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-  if ([[segue identifier] isEqualToString:@"showDetail"]) {
-      NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-      NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-      DetailViewController *controller = (DetailViewController *)[[segue destinationViewController] topViewController];
-      [controller setDetailItem:object];
-      controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
-      controller.navigationItem.leftItemsSupplementBackButton = YES;
-  }
-}
+//#pragma mark - Segues
+//
+//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+//  if ([[segue identifier] isEqualToString:@"showDetail"]) {
+//      NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+//      Event *event = (Event *)[[self fetchedResultsController] objectAtIndexPath:indexPath];
+//      DetailViewController *controller = (DetailViewController *)[[segue destinationViewController] topViewController];
+//      [controller setEvent:event];
+//      controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+//      controller.navigationItem.leftItemsSupplementBackButton = YES;
+//  }
+//}
 
 #pragma mark - Table View
 
@@ -494,6 +566,20 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   _startingVerse = [[history valueForKey:@"startingVerse"] integerValue];
   _endingVerse = [[history valueForKey:@"endingVerse"] integerValue];
   [self playGlobalVariablesHack];
+  
+  [self createAndLaunchDetailViewControllerForIndexPath:indexPath];
+  _justPushedPlayButton = true;
+}
+
+- (void)createAndLaunchDetailViewControllerForIndexPath:(NSIndexPath *)indexPath {
+  Event *event = (Event *)[[self fetchedResultsController] objectAtIndexPath:indexPath];
+  DetailViewController *controller = [[DetailViewController alloc] initWithEvent:event];
+  [controller setEvent:event];
+  [controller setVerseAudioPlayerDelegate:self];
+  
+  controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+  controller.navigationItem.leftItemsSupplementBackButton = YES;
+  [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (NSManagedObject *)getSelectedCoreDataObjectOrNil {

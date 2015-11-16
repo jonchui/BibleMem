@@ -18,6 +18,12 @@
 		40B317271BF7194400F4C311 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 40B317251BF7194400F4C311 /* LaunchScreen.storyboard */; };
 		40B317321BF7194400F4C311 /* BibleMem_ObjCTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 40B317311BF7194400F4C311 /* BibleMem_ObjCTests.m */; };
 		40B3173D1BF7194400F4C311 /* BibleMem_ObjCUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 40B3173C1BF7194400F4C311 /* BibleMem_ObjCUITests.m */; };
+		A70BE1B81BF9614B00461D44 /* VerseTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A70BE1B61BF9614B00461D44 /* VerseTableViewCell.m */; settings = {ASSET_TAGS = (); }; };
+		A70BE1B91BF9614B00461D44 /* VerseTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A70BE1B61BF9614B00461D44 /* VerseTableViewCell.m */; settings = {ASSET_TAGS = (); }; };
+		A70BE1BA1BF9614B00461D44 /* VerseTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A70BE1B61BF9614B00461D44 /* VerseTableViewCell.m */; settings = {ASSET_TAGS = (); }; };
+		A70BE1BB1BF9614B00461D44 /* VerseTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A70BE1B71BF9614B00461D44 /* VerseTableViewCell.xib */; settings = {ASSET_TAGS = (); }; };
+		A70BE1BC1BF9614B00461D44 /* VerseTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A70BE1B71BF9614B00461D44 /* VerseTableViewCell.xib */; settings = {ASSET_TAGS = (); }; };
+		A70BE1BD1BF9614B00461D44 /* VerseTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A70BE1B71BF9614B00461D44 /* VerseTableViewCell.xib */; settings = {ASSET_TAGS = (); }; };
 		FF5752E84CCE52EA1EAC7E23 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 33ECEA6C1B6AAC87B9D44D9B /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +68,9 @@
 		40B317381BF7194400F4C311 /* BibleMem_ObjCUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BibleMem_ObjCUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		40B3173C1BF7194400F4C311 /* BibleMem_ObjCUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BibleMem_ObjCUITests.m; sourceTree = "<group>"; };
 		40B3173E1BF7194400F4C311 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A70BE1B51BF9614B00461D44 /* VerseTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerseTableViewCell.h; sourceTree = "<group>"; };
+		A70BE1B61BF9614B00461D44 /* VerseTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VerseTableViewCell.m; sourceTree = "<group>"; };
+		A70BE1B71BF9614B00461D44 /* VerseTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = VerseTableViewCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +125,7 @@
 		40B317101BF7194400F4C311 /* BibleMem_ObjC */ = {
 			isa = PBXGroup;
 			children = (
+				A70BE1AF1BF95EDD00461D44 /* Cells */,
 				40B317141BF7194400F4C311 /* AppDelegate.h */,
 				40B317151BF7194400F4C311 /* AppDelegate.m */,
 				40B3171A1BF7194400F4C311 /* MasterViewController.h */,
@@ -165,6 +175,16 @@
 				33ECEA6C1B6AAC87B9D44D9B /* libPods.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A70BE1AF1BF95EDD00461D44 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				A70BE1B51BF9614B00461D44 /* VerseTableViewCell.h */,
+				A70BE1B61BF9614B00461D44 /* VerseTableViewCell.m */,
+				A70BE1B71BF9614B00461D44 /* VerseTableViewCell.xib */,
+			);
+			name = Cells;
 			sourceTree = "<group>";
 		};
 		E35A8B7E4D6884F08A5D96AB /* Pods */ = {
@@ -288,6 +308,7 @@
 				40B317271BF7194400F4C311 /* LaunchScreen.storyboard in Resources */,
 				40B317241BF7194400F4C311 /* Assets.xcassets in Resources */,
 				40B317221BF7194400F4C311 /* Main.storyboard in Resources */,
+				A70BE1BB1BF9614B00461D44 /* VerseTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +316,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A70BE1BC1BF9614B00461D44 /* VerseTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,6 +324,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A70BE1BD1BF9614B00461D44 /* VerseTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,6 +388,7 @@
 				40B317161BF7194400F4C311 /* AppDelegate.m in Sources */,
 				40B317131BF7194400F4C311 /* main.m in Sources */,
 				40B317191BF7194400F4C311 /* BibleMem_ObjC.xcdatamodeld in Sources */,
+				A70BE1B81BF9614B00461D44 /* VerseTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,6 +397,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				40B317321BF7194400F4C311 /* BibleMem_ObjCTests.m in Sources */,
+				A70BE1B91BF9614B00461D44 /* VerseTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,6 +406,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				40B3173D1BF7194400F4C311 /* BibleMem_ObjCUITests.m in Sources */,
+				A70BE1BA1BF9614B00461D44 /* VerseTableViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
