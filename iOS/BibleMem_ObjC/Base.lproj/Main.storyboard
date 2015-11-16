@@ -30,7 +30,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="VerseCell" id="SzO-gk-KIB">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="VerseCell" id="SzO-gk-KIB" customClass="VerseTableViewCell">
                                 <rect key="frame" x="0.0" y="28" width="600" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="SzO-gk-KIB" id="coj-uh-Lw4">
@@ -51,6 +51,9 @@
                                         <constraint firstItem="RCP-VP-NtS" firstAttribute="leading" secondItem="coj-uh-Lw4" secondAttribute="leadingMargin" constant="-8" id="xyv-iQ-7tG"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="versesTextView" destination="RCP-VP-NtS" id="XG1-w9-tYg"/>
+                                </connections>
                             </tableViewCell>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="LoadingCell" textLabel="uim-A5-xqb" rowHeight="38" style="IBUITableViewCellStyleDefault" id="uJh-kL-c1w">
                                 <rect key="frame" x="0.0" y="72" width="600" height="38"/>

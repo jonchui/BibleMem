@@ -8,6 +8,7 @@
 
 #import "DetailViewController.h"
 #import <dbt-sdk/dbt.h>
+#import "VerseTableViewCell.h"
 
 @interface DetailViewController ()
 
@@ -64,7 +65,7 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-  NSString *identifier = [self hasDownloadedVerseData] ? @"VerseCell" : @"LoadingCell";
+  NSString *identifier = @"VerseCell";
   UITableViewCell *cell =
       [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
   [self configureCell:cell atIndexPath:indexPath];
@@ -98,6 +99,8 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+  
+  [self.tableView registerClass:VerseTableViewCell.class forCellReuseIdentifier:@"VerseCell"];
   // Do any additional setup after loading the view, typically from a nib.
   [self configureView];
 }
