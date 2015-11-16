@@ -9,6 +9,7 @@
 #import "DetailViewController.h"
 #import <dbt-sdk/dbt.h>
 #import "VerseTableViewCell.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface DetailViewController ()
 

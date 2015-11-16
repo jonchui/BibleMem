@@ -10,12 +10,14 @@
 #import <CoreData/CoreData.h>
 #import <AVFoundation/AVFoundation.h>
 
-@class DetailViewController;
+#import "DetailViewController.h"
+//@class DetailViewController;
 
 @interface MasterViewController : UITableViewController <
     NSFetchedResultsControllerDelegate,
     UIPickerViewDelegate,
-    UIPickerViewDataSource> {
+    UIPickerViewDataSource,
+    VerseAudioPlayerDelegate> {
   NSTimer *verseTimer;
 }
 

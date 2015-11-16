@@ -147,12 +147,20 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   _playDuration = [endTimeOffset floatValue] - [startTimeOffset floatValue];
   NSLog(@"endTimeOffset - startTimeOffset: %f", _playDuration);
 
+  [self createTimerAndPlay];
+}
+
+- (void) createTimerAndPlay {
+  if (verseTimer != nil) {
+    [self pause];
+  }
+  
   verseTimer = [NSTimer scheduledTimerWithTimeInterval:_playDuration
                                                 target:self
                                               selector:@selector(timerFired:)
                                               userInfo:nil
                                                repeats:NO];
-
+  
   [self.audioPlayer play];
 }
 
@@ -286,10 +294,18 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 
 #pragma mark - play pause 
 
-- (void)pausePlayback:(id)sender {
+-(void)pause {
   [verseTimer invalidate];
   verseTimer = nil;
   [_audioPlayer pause];
+}
+
+-(void)play {
+  [self createTimerAndPlay];
+}
+
+- (void)pausePlayback:(id)sender {
+  [self pause];
 }
 
 - (void) setGlobalVariablesHack {
@@ -434,18 +450,18 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 }
 
 
-#pragma mark - Segues
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-  if ([[segue identifier] isEqualToString:@"showDetail"]) {
-      NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-      Event *event = (Event *)[[self fetchedResultsController] objectAtIndexPath:indexPath];
-      DetailViewController *controller = (DetailViewController *)[[segue destinationViewController] topViewController];
-      [controller setEvent:event];
-      controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
-      controller.navigationItem.leftItemsSupplementBackButton = YES;
-  }
-}
+//#pragma mark - Segues
+//
+//- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+//  if ([[segue identifier] isEqualToString:@"showDetail"]) {
+//      NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+//      Event *event = (Event *)[[self fetchedResultsController] objectAtIndexPath:indexPath];
+//      DetailViewController *controller = (DetailViewController *)[[segue destinationViewController] topViewController];
+//      [controller setEvent:event];
+//      controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+//      controller.navigationItem.leftItemsSupplementBackButton = YES;
+//  }
+//}
 
 #pragma mark - Table View
 
@@ -498,9 +514,15 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   _endingVerse = [[history valueForKey:@"endingVerse"] integerValue];
   [self playGlobalVariablesHack];
   
+  [self createAndLaunchDetailViewControllerForIndexPath:indexPath];
+}
+
+- (void)createAndLaunchDetailViewControllerForIndexPath:(NSIndexPath *)indexPath {
   Event *event = (Event *)[[self fetchedResultsController] objectAtIndexPath:indexPath];
   DetailViewController *controller = [[DetailViewController alloc] initWithEvent:event];
   [controller setEvent:event];
+  [controller setVerseAudioPlayerDelegate:self];
+  
   controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
   controller.navigationItem.leftItemsSupplementBackButton = YES;
   [self.navigationController pushViewController:controller animated:YES];
