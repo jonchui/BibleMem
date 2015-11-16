@@ -17,7 +17,6 @@
 
 @property (nonatomic,strong) UIBarButtonItem *playButton;
 @property (nonatomic,strong) UIBarButtonItem *pauseButton;
-- (void)updatePlayButtonState;
 
 @end
 
@@ -28,7 +27,7 @@
    return [super init];
 }
 
-- (void)updatePlaybackButton {
+- (void)updatePlayButtonState {
   if ([_verseAudioPlayerDelegate isPlaying]) {
     self.navigationItem.rightBarButtonItem = _pauseButton;
   } else {
@@ -43,7 +42,7 @@
     [_verseAudioPlayerDelegate pause];
     _verseAudioPlayerDelegate = verseAudioPlayerDelegate;
   }
-  [self updatePlaybackButton];
+  [self updatePlayButtonState];
 }
 
 - (void)setEvent:(Event *)event {

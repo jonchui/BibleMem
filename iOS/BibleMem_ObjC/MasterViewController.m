@@ -48,9 +48,15 @@
 @property int startingVerse;
 @property int endingVerse;
 
+// Necessary to know if we've pushed "play" but timer might not be set yet.
+// so that we can show play button in next view.
+// reset whenever we press stop or pause.
+@property (nonatomic, assign) BOOL justPushedPlayButton;
+
 // TODO: rip this out into a comon view controller, so we can use it in DetailViewController too
 @property (nonatomic,strong) UIBarButtonItem *playButton;
 @property (nonatomic,strong) UIBarButtonItem *pauseButton;
+
 - (void)updatePlayButtonState;
 
 - (void)startTimedPlayback;
@@ -172,6 +178,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   }
   
   verseTimer = [NSTimer scheduledTimerWithTimeInterval:_playDuration
+                
                                                 target:self
                                               selector:@selector(timerFired:)
                                               userInfo:nil
@@ -303,7 +310,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 }
 
-// TODO - do better validation, like verses, etc.
+// TODO - do better validation, like verses, etc. This is more like has books
 - (BOOL)versesValid {
   if (![self selectedBook] || !self.books || self.books.count == 0 ) {
     return false;
@@ -317,15 +324,32 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   [verseTimer invalidate];
   verseTimer = nil;
   [_audioPlayer pause];
+  _justPushedPlayButton = NO;
 }
 
 - (void)play {
-  [self createTimerAndPlay];
+  if ([self fullScriptureReferenceSet]) {
+    [self createTimerAndPlay];    
+  } else {
+    [self listenToVerseButtonPressed];
+  }
+
 }
 
 - (BOOL)isPlaying {
   // TODO - fix this to be more robust. an actual play/puase thing
-  return verseTimer != nil;
+  return _justPushedPlayButton || verseTimer != nil;
+}
+
+- (BOOL)fullScriptureReferenceSet {
+  return [self globalVaraiblesHackSet]
+    && [self selectedBook]
+    && [self getSelectedChapterInt] > 0
+    && [self versesValid];
+}
+
+- (BOOL)globalVaraiblesHackSet {
+  return _book && _chapter && _startingVerse &&_endingVerse;
 }
 
 - (void)togglePlayback:(id)sender {
@@ -544,6 +568,7 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
   [self playGlobalVariablesHack];
   
   [self createAndLaunchDetailViewControllerForIndexPath:indexPath];
+  _justPushedPlayButton = true;
 }
 
 - (void)createAndLaunchDetailViewControllerForIndexPath:(NSIndexPath *)indexPath {
