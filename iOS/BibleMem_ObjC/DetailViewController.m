@@ -15,6 +15,10 @@
 
 @property NSArray *verses;
 
+@property (nonatomic,strong) UIBarButtonItem *playButton;
+@property (nonatomic,strong) UIBarButtonItem *pauseButton;
+- (void)updatePlayButtonState;
+
 @end
 
 @implementation DetailViewController
@@ -23,7 +27,24 @@
   [self setEvent:event];
    return [super init];
 }
+
+- (void)updatePlaybackButton {
+  if ([_verseAudioPlayerDelegate isPlaying]) {
+    self.navigationItem.rightBarButtonItem = _pauseButton;
+  } else {
+    self.navigationItem.rightBarButtonItem = _playButton;
+  }
+}
+
 #pragma mark - Managing the detail item
+
+- (void)setVerseAudioPlayerDelegate:(id<VerseAudioPlayerDelegate>)verseAudioPlayerDelegate {
+  if (verseAudioPlayerDelegate != _verseAudioPlayerDelegate) {
+    [_verseAudioPlayerDelegate pause];
+    _verseAudioPlayerDelegate = verseAudioPlayerDelegate;
+  }
+  [self updatePlaybackButton];
+}
 
 - (void)setEvent:(Event *)event {
   if (_event != event) {
@@ -123,6 +144,19 @@
   self.tableView.rowHeight = UITableViewAutomaticDimension;
   
   [self configureView];
+  
+  _pauseButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(togglePlayback:)];
+  _playButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(togglePlayback:)];
+  [self updatePlayButtonState];
+}
+
+- (void)togglePlayback:(id)sender {
+  if ([self.verseAudioPlayerDelegate isPlaying]) {
+    [self.verseAudioPlayerDelegate pause];
+  } else {
+    [self.verseAudioPlayerDelegate play];
+  }
+  [self updatePlayButtonState];
 }
 
 #pragma mark - memory

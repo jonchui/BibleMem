@@ -48,6 +48,11 @@
 @property int startingVerse;
 @property int endingVerse;
 
+// TODO: rip this out into a comon view controller, so we can use it in DetailViewController too
+@property (nonatomic,strong) UIBarButtonItem *playButton;
+@property (nonatomic,strong) UIBarButtonItem *pauseButton;
+- (void)updatePlayButtonState;
+
 - (void)startTimedPlayback;
 
 @end
@@ -94,8 +99,10 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   // Do any additional setup after loading the view, typically from a nib.
   self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
-  UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pausePlayback:)];
-  self.navigationItem.rightBarButtonItem = addButton;
+  _pauseButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(togglePlayback:)];
+  _playButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(togglePlayback:)];
+  [self updatePlayButtonState];
+  
   self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
   
   // Download all books and populate as needed
@@ -107,6 +114,14 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
                        } failure:^(NSError *error) {
                          NSLog(@"Error: %@", error);
                        }];
+}
+
+- (void)updatePlayButtonState {
+  if ([self isPlaying]) {
+    self.navigationItem.rightBarButtonItem = _pauseButton;
+  } else {
+    self.navigationItem.rightBarButtonItem = _playButton;
+  }
 }
 
 // Be careful, this function gets called on a timer, so make sure the code is minimal
@@ -125,6 +140,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
   } else {
     [self.verseField setText:[NSString stringWithFormat:@"%d-%d", _startingVerse, _endingVerse]];
   }
+  [self updatePlayButtonState];
   [self updateReadButtonWithSelectedText];
   
   int zeroIndexedVerse = _startingVerse - 1;
@@ -162,6 +178,7 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
                                                repeats:NO];
   
   [self.audioPlayer play];
+  [self updatePlayButtonState];
 }
 
 - (void)saveVolumesAndBooksForEnglishToFile {
@@ -207,6 +224,8 @@ static const NSString *DOWNLOADED_VOLUMES_FILENAME = @"downloadedVolumesAndBooks
 
   [self updateReadButtonWithSelectedText];
   [self.listenToVerseButton setEnabled:[self versesValid]];
+  
+  [self updatePlayButtonState];
 }
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
@@ -294,18 +313,28 @@ return [NSString stringWithFormat:@"%d", [self getSelectedChapterInt]] ;
 
 #pragma mark - play pause 
 
--(void)pause {
+- (void)pause {
   [verseTimer invalidate];
   verseTimer = nil;
   [_audioPlayer pause];
 }
 
--(void)play {
+- (void)play {
   [self createTimerAndPlay];
 }
 
-- (void)pausePlayback:(id)sender {
-  [self pause];
+- (BOOL)isPlaying {
+  // TODO - fix this to be more robust. an actual play/puase thing
+  return verseTimer != nil;
+}
+
+- (void)togglePlayback:(id)sender {
+  if ([self isPlaying]) {
+    [self pause];
+  } else {
+    [self play];
+  }
+  [self updatePlayButtonState];
 }
 
 - (void) setGlobalVariablesHack {

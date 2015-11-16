@@ -13,6 +13,7 @@
 @required
 -(void)pause;
 -(void)play;
+-(BOOL)isPlaying;
 @end
 
 @interface DetailViewController : UITableViewController
